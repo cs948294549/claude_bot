@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "network_mcp": {
+      "type": "http",
+      "url": "http://your-mcp-server:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer your-token-here"
+      }
+    }
+  }
+}

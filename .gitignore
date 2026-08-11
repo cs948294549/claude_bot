@@ -1,0 +1,30 @@
+node_modules/
+logs/
+workspaces/
+*.log
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+coverage/
+dist/
+build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Claude workspace
+/tmp/claude-workspace/
+
+# Sensitive configs - DO NOT COMMIT
+.env
+.env.production
+.env.development
+mcp-config.json

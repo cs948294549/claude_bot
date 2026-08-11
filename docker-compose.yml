@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  network-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: network-bot
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      # 企业微信智能机器人配置
+      - BOT_ID=${BOT_ID}
+      - BOT_SECRET=${BOT_SECRET}
+
+      # 服务配置
+      - PORT=${PORT:-3000}
+      - NODE_ENV=${NODE_ENV:-production}
+
+      # Claude 配置
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - CLAUDE_CLI_PATH=${CLAUDE_CLI_PATH:-claude}
+      - CLAUDE_THINKING_EFFORT=${CLAUDE_THINKING_EFFORT:-high}
+
+      # Anthropic API 配置（可选，优先级高于 CLAUDE_API_KEY）
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN}
+      - ANTHROPIC_BASE_URL=${ANTHROPIC_BASE_URL}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
+
+      # 会话管理
+      - SESSION_TIMEOUT=${SESSION_TIMEOUT:-1800000}
+      - MAX_CONCURRENT_SESSIONS=${MAX_CONCURRENT_SESSIONS:-50}
+      - WORKSPACE_BASE_PATH=${WORKSPACE_BASE_PATH:-/tmp/claude-workspace}
+
+      # 权限控制（可选）
+      - ALLOWED_USERS=${ALLOWED_USERS:-}
+      - MAX_MESSAGE_LENGTH=${MAX_MESSAGE_LENGTH:-10000}
+
+      # MCP 配置路径
+      - MCP_CONFIG_PATH=${MCP_CONFIG_PATH:-/app/mcp-config.json}
+
+    volumes:
+      # 持久化工作空间（可选）
+      - claude-workspace:/tmp/claude-workspace
+      # 持久化日志
+      - ./logs:/app/logs
+      # MCP 配置文件
+      - ./mcp-config.json:/app/mcp-config.json:ro
+
+    networks:
+      - network-bot-net
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  claude-workspace:
+    driver: local
+
+networks:
+  network-bot-net:
+    driver: bridge
