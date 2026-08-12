@@ -36,7 +36,7 @@ fi
 
 # 检查必要文件
 echo -e "${YELLOW}检查必要文件...${NC}"
-required_files=("package.json" "mcp-config.json" ".env.docker")
+required_files=("package.json" "mcp-config.json" ".env")
 for file in "${required_files[@]}"; do
     if [ ! -f "$file" ]; then
         echo -e "${RED}警告: $file 不存在${NC}"
