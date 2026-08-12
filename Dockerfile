@@ -1,5 +1,8 @@
 FROM node:20-alpine
 
+# 设置 Alpine 镜像源（使用阿里云镜像）
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # 安装必要的系统依赖
 RUN apk update && apk add --no-cache \
     bash \
