@@ -104,9 +104,16 @@ if [ $? -eq 0 ]; then
     echo ""
     echo -e "${YELLOW}常用命令:${NC}"
     echo -e "  查看日志: ${GREEN}docker logs -f ${CONTAINER_NAME}${NC}"
+    echo -e "  查看应用日志文件: ${GREEN}ls -lh ${LOGS_DIR}${NC}"
+    echo -e "  实时监控日志: ${GREEN}tail -f ${LOGS_DIR}/*.log${NC}"
     echo -e "  停止容器: ${GREEN}docker stop ${CONTAINER_NAME}${NC}"
     echo -e "  重启容器: ${GREEN}docker restart ${CONTAINER_NAME}${NC}"
     echo -e "  进入容器: ${GREEN}docker exec -it ${CONTAINER_NAME} sh${NC}"
+    echo ""
+    echo -e "${YELLOW}日志位置:${NC}"
+    echo -e "  Docker 日志: ${GREEN}docker logs ${CONTAINER_NAME}${NC}"
+    echo -e "  应用日志: ${GREEN}${LOGS_DIR}/${NC}"
+    echo -e "  容器内日志: ${GREEN}/app/logs/${NC}"
     echo ""
 
     # 等待几秒后检查健康状态
