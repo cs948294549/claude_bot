@@ -25,6 +25,7 @@ temp/
 
 # Sensitive configs - DO NOT COMMIT
 .env
+.env.docker
 .env.production
 .env.development
 mcp-config.json

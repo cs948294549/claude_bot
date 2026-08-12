@@ -1,13 +1,15 @@
 FROM node:20-alpine
 
 # 安装必要的系统依赖
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     bash \
     curl \
     git \
     python3 \
+    py3-pip \
     make \
-    g++
+    g++ \
+    && rm -rf /var/cache/apk/*
 
 # 创建应用目录
 WORKDIR /app
