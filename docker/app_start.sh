@@ -62,9 +62,9 @@ echo -e "${GREEN}✓${NC} 工作区目录: ${WORKSPACE_DIR}"
 echo -e "${GREEN}✓${NC} 配置目录: ${CONFIG_DIR}"
 echo ""
 
-# 检查 .env.docker 文件
-if [ ! -f ".env.docker" ]; then
-    echo -e "${RED}警告: .env.docker 文件不存在${NC}"
+# 检查 .env 文件
+if [ ! -f ".env" ]; then
+    echo -e "${RED}警告: .env 文件不存在${NC}"
     echo -e "${YELLOW}容器将使用默认环境变量${NC}"
     echo ""
 fi
@@ -76,7 +76,7 @@ echo ""
 docker run -d \
     --name "${CONTAINER_NAME}" \
     -p "${HOST_PORT}:${CONTAINER_PORT}" \
-    --env-file .env.docker \
+    --env-file .env \
     -e NODE_ENV=production \
     -v "${LOGS_DIR}:/app/logs" \
     -v "${WORKSPACE_DIR}:/tmp/claude-workspace" \
