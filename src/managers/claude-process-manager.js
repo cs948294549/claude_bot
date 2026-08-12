@@ -1,5 +1,6 @@
 const { spawn } = require('child_process');
 const EventEmitter = require('events');
+const path = require('path');
 const logger = require('../utils/logger');
 const crypto = require('crypto');
 
@@ -55,7 +56,7 @@ class ClaudeProcessManager extends EventEmitter {
 
       // 添加 MCP 配置
       const mcpConfigPath = this.config.mcpConfigPath ||
-                           '/Users/weidian/netops/projects/network_bot/mcp-config.json';
+                           path.join(__dirname, '../../mcp-config.json');
       args.push('--mcp-config', mcpConfigPath);
 
       // 添加 effort 参数
