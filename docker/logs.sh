@@ -6,7 +6,7 @@
 set -e
 
 CONTAINER_NAME="network_bot"
-DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-/root/docker_apps/network_bot}"
+DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-$(pwd)}"
 LOGS_DIR="${DATA_BASE_DIR}/logs"
 
 # 颜色输出

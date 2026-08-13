@@ -12,8 +12,8 @@ IMAGE_TAG="${1:-v1}"
 HOST_PORT="${2:-3000}"
 CONTAINER_PORT="3000"
 
-# 数据目录配置（根据实际部署环境修改）
-DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-/root/docker_apps/network_bot}"
+# 数据目录配置（默认为当前目录）
+DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-$(pwd)}"
 LOGS_DIR="${DATA_BASE_DIR}/logs"
 WORKSPACE_DIR="${DATA_BASE_DIR}/workspace"
 CONFIG_DIR="${DATA_BASE_DIR}/configs"
