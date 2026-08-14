@@ -58,6 +58,7 @@ class ClaudeAiBotBridge {
       thinkingMode: process.env.CLAUDE_THINKING_MODE || 'adaptive',
       thinkingEffort: process.env.CLAUDE_THINKING_EFFORT || 'high',
       claudeApiKey: process.env.CLAUDE_API_KEY,
+      claudeProcessTimeout: parseInt(process.env.CLAUDE_PROCESS_TIMEOUT) || 120000,
 
       sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 1800000,
       maxConcurrentSessions: parseInt(process.env.MAX_CONCURRENT_SESSIONS) || 50,
