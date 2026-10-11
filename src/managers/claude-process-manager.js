@@ -108,6 +108,9 @@ class ClaudeProcessManager extends EventEmitter {
       const chunk = data.toString();
       outputBuffer += chunk;
 
+      // 每次收到数据时重置空闲超时
+      this.resetIdleTimeout(userId, process);
+
       // 按行分割处理
       const lines = outputBuffer.split('\n');
       outputBuffer = lines.pop() || '';
@@ -233,13 +236,13 @@ class ClaudeProcessManager extends EventEmitter {
   }
 
   /**
-   * 设置进程超时保护
+   * 设置进程空闲超时保护（无数据返回时才计时）
    */
   setProcessTimeout(userId, process) {
-    const timeout = this.config.claudeProcessTimeout || 120000; // 默认 2 分钟
+    const timeout = this.config.claudeIdleTimeout || 60000; // 默认 60 秒空闲超时
 
     const timeoutId = setTimeout(() => {
-      logger.warn(`Claude process timeout for user ${userId}, killing process`);
+      logger.warn(`Claude process idle timeout for user ${userId} (no data for ${timeout}ms), killing process`);
 
       try {
         // 尝试优雅终止
@@ -268,7 +271,17 @@ class ClaudeProcessManager extends EventEmitter {
     }, timeout);
 
     this.processTimeouts.set(userId, timeoutId);
-    logger.debug(`Set process timeout for user ${userId}: ${timeout}ms`);
+    logger.debug(`Set process idle timeout for user ${userId}: ${timeout}ms`);
+  }
+
+  /**
+   * 重置空闲超时定时器（收到数据时调用）
+   */
+  resetIdleTimeout(userId, process) {
+    // 清除旧的定时器
+    this.clearProcessTimeout(userId);
+    // 设置新的定时器
+    this.setProcessTimeout(userId, process);
   }
 
   /**

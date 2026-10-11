@@ -30,7 +30,8 @@ class ClaudeAiBotBridge {
       claudeCliPath: this.config.claudeCliPath,
       thinkingMode: this.config.thinkingMode,
       thinkingEffort: this.config.thinkingEffort,
-      claudeApiKey: this.config.claudeApiKey
+      claudeApiKey: this.config.claudeApiKey,
+      claudeIdleTimeout: this.config.claudeIdleTimeout
     });
 
     this.messageAdapter = new MessageAdapter();
@@ -58,7 +59,7 @@ class ClaudeAiBotBridge {
       thinkingMode: process.env.CLAUDE_THINKING_MODE || 'adaptive',
       thinkingEffort: process.env.CLAUDE_THINKING_EFFORT || 'high',
       claudeApiKey: process.env.CLAUDE_API_KEY,
-      claudeProcessTimeout: parseInt(process.env.CLAUDE_PROCESS_TIMEOUT) || 120000,
+      claudeIdleTimeout: parseInt(process.env.CLAUDE_IDLE_TIMEOUT) || 60000,
 
       sessionTimeout: parseInt(process.env.SESSION_TIMEOUT) || 1800000,
       maxConcurrentSessions: parseInt(process.env.MAX_CONCURRENT_SESSIONS) || 50,
