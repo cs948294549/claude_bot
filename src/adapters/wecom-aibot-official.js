@@ -49,7 +49,8 @@ class WeComAiBotAdapter extends EventEmitter {
 
       // 监听文本消息
       this.client.on('message.text', (frame) => {
-        logger.info('收到文本消息:', frame.body.text?.content);
+        // 打印 chattype/chatid/userid，便于获取群 chatid 用于主动推送
+        logger.info(`收到文本消息: chattype=${frame.body?.chattype}, chatid=${frame.body?.chatid || '-'}, userid=${frame.body?.from?.userid}, content=${frame.body?.text?.content}`);
         this.handleTextMessage(frame);
       });
 
