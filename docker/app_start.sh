@@ -13,6 +13,8 @@ HOST_PORT="${2:-3000}"
 CONTAINER_PORT="3000"
 # 宿主机绑定地址：默认只绑 127.0.0.1，不对外开放；容器间通过 Docker 网络访问
 HOST_BIND="${NETWORK_BOT_BIND:-127.0.0.1}"
+# Docker 自定义网络：与 central-server 共用，容器间可用容器名互相访问
+DOCKER_NETWORK="${DOCKER_NETWORK:-netops}"
 
 # 数据目录配置（默认为当前目录）
 DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-$(pwd)}"
@@ -33,6 +35,7 @@ echo ""
 echo -e "${YELLOW}容器名称:${NC} ${CONTAINER_NAME}"
 echo -e "${YELLOW}镜像:${NC} ${IMAGE_NAME}:${IMAGE_TAG}"
 echo -e "${YELLOW}端口映射:${NC} ${HOST_BIND}:${HOST_PORT}:${CONTAINER_PORT}"
+echo -e "${YELLOW}Docker 网络:${NC} ${DOCKER_NETWORK}"
 echo ""
 
 # 切换到脚本所在目录的父目录（项目根目录）
@@ -51,6 +54,14 @@ if docker ps -a | grep -q "${CONTAINER_NAME}"; then
     docker stop "${CONTAINER_NAME}" 2>/dev/null || true
     docker rm "${CONTAINER_NAME}" 2>/dev/null || true
     echo -e "${GREEN}✓${NC} 旧容器已清理"
+    echo ""
+fi
+
+# 检查 Docker 网络，不存在则创建
+if ! docker network inspect "${DOCKER_NETWORK}" >/dev/null 2>&1; then
+    echo -e "${YELLOW}Docker 网络 ${DOCKER_NETWORK} 不存在，正在创建...${NC}"
+    docker network create "${DOCKER_NETWORK}"
+    echo -e "${GREEN}✓${NC} 网络已创建: ${DOCKER_NETWORK}"
     echo ""
 fi
 
@@ -77,6 +88,7 @@ echo ""
 
 docker run -d \
     --name "${CONTAINER_NAME}" \
+    --network "${DOCKER_NETWORK}" \
     -p "${HOST_BIND}:${HOST_PORT}:${CONTAINER_PORT}" \
     --env-file .env \
     -e NODE_ENV=production \
