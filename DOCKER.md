@@ -33,34 +33,22 @@ cp .env.docker .env
 
 ### 3. 构建并启动
 
-使用 Docker Compose（推荐）：
-```bash
-docker-compose up -d
-```
-
-或使用 Docker：
 ```bash
 # 构建镜像
-docker build -t network-bot:latest .
+./docker/app_build.sh v1
 
-# 运行容器
-docker run -d \
-  --name network-bot \
-  --env-file .env \
-  -p 3000:3000 \
-  -v $(pwd)/logs:/app/logs \
-  -v $(pwd)/mcp-config.json:/app/mcp-config.json:ro \
-  network-bot:latest
+# 启动容器（端口仅绑定宿主机 127.0.0.1）
+./docker/app_start.sh v1 3000
 ```
+
+脚本参数说明见 [docker/README.md](./docker/README.md)。
 
 ### 4. 查看日志
 
 ```bash
-# 使用 docker-compose
-docker-compose logs -f
-
-# 使用 docker
-docker logs -f network-bot
+docker logs -f network_bot
+# 或
+./docker/logs.sh
 ```
 
 ### 5. 健康检查
@@ -133,41 +121,39 @@ curl http://localhost:3000/health
 
 ### 重启服务
 ```bash
-docker-compose restart
+docker restart network_bot
 ```
 
 ### 停止服务
 ```bash
-docker-compose down
+docker stop network_bot
 ```
 
 ### 查看状态
 ```bash
-docker-compose ps
+docker ps | grep network_bot
 ```
 
 ### 进入容器
 ```bash
-docker-compose exec network-bot sh
+docker exec -it network_bot sh
 ```
 
 ### 清理并重建
 ```bash
-docker-compose down -v
-docker-compose up -d --build
+./docker/app_build.sh v1
+./docker/app_start.sh v1 3000   # 会自动停止并删除旧容器
 ```
 
 ## 数据持久化
 
-Docker Compose 配置会自动创建以下卷：
-- `claude-workspace`: Claude 工作空间数据
-- `./logs`: 应用日志（挂载到主机）
+`app_start.sh` 挂载以下目录到宿主机（基于 `NETWORK_BOT_DATA_DIR`，默认当前目录）：
+- `logs/`: 应用日志
+- `workspace/`: Claude 工作空间数据
 
 ## 网络配置
 
-如果 MCP 服务器运行在同一 Docker 网络中：
-1. 将 MCP 服务加入 `network-bot-net` 网络
-2. 更新 `mcp-config.json` 中的 URL 为容器名称
+如果 MCP 服务器运行在同一 Docker 网络中，可将 `mcp-config.json` 中的 URL 改为容器名称
 
 示例：
 ```json
@@ -189,10 +175,10 @@ Docker Compose 配置会自动创建以下卷：
 ### 1. 容器无法启动
 ```bash
 # 查看详细日志
-docker-compose logs network-bot
+docker logs network_bot
 
-# 检查配置
-docker-compose config
+# 检查容器启动参数
+docker inspect network_bot
 ```
 
 ### 2. 无法连接企业微信
@@ -202,7 +188,7 @@ docker-compose config
 ### 3. Claude 调用失败
 - 检查 `CLAUDE_API_KEY` 是否有效
 - 查看容器日志中的 Claude 错误信息
-- 确认 Claude CLI 安装成功：`docker-compose exec network-bot claude --version`
+- 确认 Claude CLI 安装成功：`docker exec network_bot claude --version`
 
 ### 4. MCP 工具无法使用
 - 检查 `mcp-config.json` 配置是否正确
@@ -219,19 +205,10 @@ docker-compose config
 
 ## 扩展配置
 
-如需添加资源限制，编辑 `docker-compose.yml`：
-```yaml
-services:
-  network-bot:
-    # ... 其他配置
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 2G
-        reservations:
-          cpus: '1'
-          memory: 1G
+如需添加资源限制，编辑 `docker/app_start.sh`，在 `docker run` 参数中添加：
+```bash
+    --cpus 2 \
+    --memory 2g \
 ```
 
 ## 更新
@@ -241,5 +218,6 @@ services:
 git pull
 
 # 重新构建并启动
-docker-compose up -d --build
+./docker/app_build.sh v1
+./docker/app_start.sh v1 3000
 ```

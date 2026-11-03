@@ -275,6 +275,33 @@ class WeComAiBotAdapter extends EventEmitter {
   }
 
   /**
+   * 主动推送消息（aibot_send_msg，复用当前长连接）
+   * @param chatid - 单聊填 userid，群聊填 chatid
+   * @param body - { msgtype: 'markdown', markdown: { content } } 或 template_card 等
+   */
+  async sendActiveMessage(chatid, body) {
+    if (!this.client || !this.isConnected) {
+      throw new Error('机器人未连接');
+    }
+
+    try {
+      const ack = await this.client.sendMessage(chatid, body);
+      logger.info(`主动消息已发送: chatid=${chatid}, msgtype=${body.msgtype}`);
+      return ack;
+    } catch (error) {
+      // 回执失败时 SDK reject 的是原始回执帧 { errcode, errmsg }
+      if (error && !(error instanceof Error) && error.errcode !== undefined) {
+        const err = new Error(`${error.errmsg} (errcode: ${error.errcode})`);
+        err.errcode = error.errcode;
+        logger.error('主动推送消息失败:', err.message);
+        throw err;
+      }
+      logger.error('主动推送消息失败:', error);
+      throw error;
+    }
+  }
+
+  /**
    * 下载文件
    */
   async downloadFile(mediaId, aesKey, savePath) {

@@ -15,7 +15,7 @@
 
 ## 快速开始
 
-### 方式一：Docker Compose（推荐）
+### 方式一：Docker（推荐）
 
 1. **准备配置文件**
 ```bash
@@ -60,14 +60,15 @@ CLAUDE_API_KEY=your_api_key
 }
 ```
 
-5. **启动服务**
+5. **构建镜像并启动服务**
 ```bash
-docker-compose up -d
+./docker/app_build.sh v1
+./docker/app_start.sh v1 3000
 ```
 
 6. **查看日志**
 ```bash
-docker-compose logs -f
+./docker/logs.sh
 ```
 
 7. **检查服务状态**
@@ -282,13 +283,13 @@ POST /admin/restart/:userId
 **解决方案**：
 ```bash
 # 查看日志
-docker-compose logs -f network-bot
+docker logs -f network_bot
 
 # 检查 Claude CLI 是否正常
-docker-compose exec network-bot claude --version
+docker exec network_bot claude --version
 
 # 检查 API Key
-docker-compose exec network-bot claude config show
+docker exec network_bot claude config show
 ```
 
 ### 3. MCP 工具不可用
@@ -306,11 +307,8 @@ docker-compose exec network-bot claude config show
 **解决方案**：
 ```bash
 # 设置资源限制
-# 编辑 docker-compose.yml，添加：
-deploy:
-  resources:
-    limits:
-      memory: 2G
+# 编辑 docker/app_start.sh，在 docker run 参数中添加：
+--memory 2g \
 ```
 
 ## 开发指南
@@ -333,7 +331,7 @@ network_bot/
 ├── mcp-config.json        # MCP 配置
 ├── .env                   # 环境变量
 ├── Dockerfile             # Docker 镜像
-├── docker-compose.yml     # Docker Compose 配置
+├── docker/                # 构建/启动/日志脚本
 └── package.json           # 依赖配置
 ```
 

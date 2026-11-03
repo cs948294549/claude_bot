@@ -122,6 +122,44 @@ class ClaudeAiBotBridge {
         res.status(500).json({ success: false, error: error.message });
       }
     });
+
+    /**
+     * 主动推送消息（供 central-server 等内部服务经 Docker 内部网络调用，不做鉴权）
+     * Body: { chatid, msgtype: 'text' | 'markdown' | 'template_card', content?, template_card? }
+     * aibot_send_msg 不支持纯 text，text 按 markdown 发送
+     */
+    this.app.post('/api/send', async (req, res) => {
+      const { chatid, msgtype = 'markdown', content, template_card } = req.body || {};
+      if (!chatid) {
+        return res.status(400).json({ success: false, error: '缺少 chatid' });
+      }
+
+      let body;
+      if (msgtype === 'text' || msgtype === 'markdown') {
+        if (!content) {
+          return res.status(400).json({ success: false, error: '缺少 content' });
+        }
+        body = { msgtype: 'markdown', markdown: { content } };
+      } else if (msgtype === 'template_card') {
+        if (!template_card) {
+          return res.status(400).json({ success: false, error: '缺少 template_card' });
+        }
+        body = { msgtype: 'template_card', template_card };
+      } else {
+        return res.status(400).json({ success: false, error: `不支持的 msgtype: ${msgtype}` });
+      }
+
+      if (!this.aibot.isConnected) {
+        return res.status(503).json({ success: false, error: '机器人未连接' });
+      }
+
+      try {
+        await this.aibot.sendActiveMessage(chatid, body);
+        res.json({ success: true });
+      } catch (error) {
+        res.status(500).json({ success: false, error: error.message, errcode: error.errcode });
+      }
+    });
   }
 
   setupAiBotHandlers() {

@@ -11,6 +11,8 @@ IMAGE_NAME="network_bot"
 IMAGE_TAG="${1:-v1}"
 HOST_PORT="${2:-3000}"
 CONTAINER_PORT="3000"
+# 宿主机绑定地址：默认只绑 127.0.0.1，不对外开放；容器间通过 Docker 网络访问
+HOST_BIND="${NETWORK_BOT_BIND:-127.0.0.1}"
 
 # 数据目录配置（默认为当前目录）
 DATA_BASE_DIR="${NETWORK_BOT_DATA_DIR:-$(pwd)}"
@@ -30,7 +32,7 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "${YELLOW}容器名称:${NC} ${CONTAINER_NAME}"
 echo -e "${YELLOW}镜像:${NC} ${IMAGE_NAME}:${IMAGE_TAG}"
-echo -e "${YELLOW}端口映射:${NC} ${HOST_PORT}:${CONTAINER_PORT}"
+echo -e "${YELLOW}端口映射:${NC} ${HOST_BIND}:${HOST_PORT}:${CONTAINER_PORT}"
 echo ""
 
 # 切换到脚本所在目录的父目录（项目根目录）
@@ -75,7 +77,7 @@ echo ""
 
 docker run -d \
     --name "${CONTAINER_NAME}" \
-    -p "${HOST_PORT}:${CONTAINER_PORT}" \
+    -p "${HOST_BIND}:${HOST_PORT}:${CONTAINER_PORT}" \
     --env-file .env \
     -e NODE_ENV=production \
     -v "${LOGS_DIR}:/app/logs" \
